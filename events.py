@@ -1,22 +1,11 @@
-async def handle_event(_self, type, *args):
+from bot_init import bot
 
-	if type == "ready":
-		await ready(_self, *args)
+# https://stackoverflow.com/a/64321470/16804863
+@bot.event
+async def on_ready():
+	print("hello")
 
-	if type == "message":
-		await message(_self, *args)
-
-
-	pass
-	
-
-async def ready(_self, boh):
-	print("fabio di m")
-
-	pass
-	
-
-async def message(_self, msg):
-	if msg.content.startwith("$hello"):
-		await msg.channel.send("Hello")
-	pass
+@bot.event
+async def on_message(message):
+	if(message.content.startswith("!")):
+		await message.channel.send("Hello")

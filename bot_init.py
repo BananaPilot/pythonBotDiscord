@@ -1,17 +1,8 @@
-# from dotenv import load_dotenv
-# import os
-# import discord
-# from my_client import MyClient
+import discord
+from discord.ext import commands
 
-# load_dotenv()
+# Event list (API reference): https://discordpy.readthedocs.io/en/stable/api.html
+# discord.ext.commands: https://discordpy.readthedocs.io/en/stable/ext/commands/index.html
+# https://discordpy.readthedocs.io/en/latest/intents.html
 
-# def create_bot():
-# 	intents = discord.Intents()
-# 	intents.message_content = True
-
-# 	client = MyClient(intents=intents)
-# 	client.run(os.environ.get("DISCORD_TOKEN"))
-
-
-
-
+bot = commands.Bot(command_prefix="!", case_insensitive=True, intents=discord.Intents.all())
