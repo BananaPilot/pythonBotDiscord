@@ -1,5 +1,7 @@
+from bot_init import create_bot
+
 def main():
-	print("Hello")
+	create_bot()
 
 if __name__ == "__main__":
 	main()
