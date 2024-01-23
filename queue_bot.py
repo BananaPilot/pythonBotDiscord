@@ -1,26 +1,28 @@
 from typing import Any
 from attr import dataclass
+from queue_element import QueueElementType, QueueElement
+
+TrackInfo = dict[str, Any]
 
 
 @dataclass
 class Queue_bot:
+    the_queue: list[QueueElementType] = []
 
-  queue: list[str] = []
+    def appendToQueue(self, element: QueueElementType):
+        self.the_queue.append(element)
+        pass
 
-  def appendToQueue(self, element: str):
-    self.queue.append(element)
+    def popFromQueue(self):
+        if len(self.the_queue) == 0:
+            return None
+
+        return self.the_queue.pop(0)
+
+    def length(self):
+        return len(self.the_queue)
+
+    def __str__(self):
+        return "\n".join(elem["fulltitle"] for elem in self.the_queue)
+
     pass
-
-  def popFromQueue(self):
-    self.queue.pop()
-    pass
-
-  def findAndDelete(self, element: str):
-    for url in self.queue:
-      if url == element:
-        self.queue.remove(url)
-    pass
-
-  
-  
-  pass

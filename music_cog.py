@@ -4,38 +4,27 @@ from discord.ext import commands
 from discord import app_commands
 import discord
 from discord_audio_player import DiscordAudioPlayer
+from queue_bot import Queue_bot
+from queue_element import QueueElementType, QueueElement
 
 
 @dataclass
 @app_commands.guild_only()
 class music_Cog(commands.Cog):
-    bot: commands.Bot
+    discord_bot: commands.Bot
     audio_player: DiscordAudioPlayer
+    queue: Queue_bot
 
     isPlaying: bool = False
     isPaused: bool = False
-
-    YDL_OPTIONS: dict[str, Any] = {
-        "format": "bestaudio/best",
-        "noplaylist": "True",
-        "verbose": True,
-        "ignoreerrors": "only_download",
-        "youtube_include_dash_manifest": False,
-        "noplaylist": True,
-    }
-
-    FFMPEG_OPTIONS: dict[str, Any] = {
-        "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5",
-        "options": "-vn",
-    }
 
     voice_channel: discord.VoiceChannel = None
 
     connected_voice_client: discord.VoiceClient = None
 
-    def addToQueue(self, element: str):
-        queue = self.queue
-        queue.append()
+    async def play_audio(self, element: QueueElementType) -> None:
+        self.audio_player.play(element, self.connected_voice_client)
+        pass
 
     @commands.command()
     async def join(self, ctx: commands.Context) -> None:
@@ -52,34 +41,54 @@ class music_Cog(commands.Cog):
         await ctx.voice_client.disconnect()
         self.connected_voice_client = None
 
+    @commands.command(name="queue")
+    async def add_to_queue(self, ctx: commands.Context, url: str) -> None:
+        """Adds a song to the queue"""
+        info = self.audio_player.extract_info(url)
+        self.queue.appendToQueue(info)
+        await ctx.send(f"Added {url} to the queue")
+
+    @commands.command(name="list")
+    async def list_queue(self, ctx: commands.Context) -> None:
+        await ctx.send(print(self.queue))
+        pass
+
     @commands.command()
     async def play(self, ctx: commands.Context, url: str) -> None:
-        """Plays a song from youtube"""
+        """Plays a song from the queue"""
 
-        voice = self.connected_voice_client
+        track_info = self.audio_player.extract_info(url)
+        element = QueueElement.create(track_info)
+        self.queue.appendToQueue(element)
+        # TODO
+        pass
 
-        if (
-            voice is None
-            or ctx.voice_client is None
-            or not ctx.voice_client.is_connected()
-        ):
-            await ctx.send("I am not connected to a voice channel. Joining...")
-            await self.join()
+    @commands.command(name="clear")
+    async def clear(self, ctx: commands.Context) -> None:
+        """Clears the queue"""
+        self.queue.the_queue.clear()
+        ctx.send("Cleard queue")
+        pass
 
-        if not ctx.author.voice.channel == ctx.voice_client.channel:
-            await ctx.send("You are not in my voice channel!")
-            return
-        if not ctx.voice_client.is_playing():
-            info = self.audio_player.get_info(url)
+    # @commands.command()
+    # async def play(self, ctx: commands.Context, url: str) -> None:
+    #     """Plays a song from youtube"""
 
-            self.audio_player.play(info, voice)
+    #     if (
+    #         self.connected_voice_client is None
+    #         or ctx.voice_client is None
+    #         or not ctx.voice_client.is_connected()
+    #     ):
+    #         await ctx.send("I am not connected to a voice channel. Joining...")
+    #         await self.join()
 
-            import json
+    #     if not ctx.author.voice.channel == ctx.voice_client.channel:
+    #         await ctx.send("You are not in my voice channel!")
+    #         return
 
-            with open("info.json", "w") as f:
-                json.dump(info, f)
-
-            await ctx.send(f"Now playing {info['url']}")
+    #     if not ctx.voice_client.is_playing():
+    #         self.play_audio()
+    #         await ctx.send(f"Now playing {url}")
 
     @commands.command()
     async def pause(self, ctx: commands.Context):

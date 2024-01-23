@@ -2,6 +2,8 @@ from typing import Any
 from attr import dataclass
 from yt_dlp import YoutubeDL
 import discord
+from queue_element import QueueElementType
+from queue_bot import TrackInfo
 
 
 @dataclass
@@ -22,16 +24,14 @@ class DiscordAudioPlayer:
         "options": "-vn",
     }
 
-    def extract_info(self, url: str) -> dict[str, Any]:
+    def extract_info(self, url: str) -> TrackInfo:
         with YoutubeDL(self.YDL_OPTIONS) as ydl:
             info = ydl.extract_info(url, download=False)
 
         return info
 
-    def play(
-        self, info: (Any | dict[str, Any] | None), voice_client: discord.VoiceClient
-    ):
-        url = info["url"]
+    def play(self, element: QueueElementType, voice_client: discord.VoiceClient):
+        url = element["url"]
 
         voice_client.play(
             discord.FFmpegPCMAudio(
