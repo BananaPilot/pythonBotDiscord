@@ -15,16 +15,7 @@ if __name__ == "__main__":
 
     # with open("info.json", "w") as f:
     # 	json.dump(info, f, indent=4)
+
     print(queue_manager)
-
-
-def process_element(element: QueueElementType):
-    # You can now access the fields in element knowing their types
-    print(element[""])
-
-
-# Example usage:
-process_element(
-)
 
 pass

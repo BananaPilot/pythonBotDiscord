@@ -1,5 +1,6 @@
 from typing import Any, TypedDict
 
+
 class QueueElementType(TypedDict):
     id: str
     fulltitle: str
