@@ -1,6 +1,6 @@
 # TODO
 
-test 2
+test
 
 <!--
 	pip install -r requirements.txt
