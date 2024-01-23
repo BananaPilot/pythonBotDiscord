@@ -16,7 +16,7 @@ def my_check(ctx: commands.Context):
 	print(ctx.command.name)
 	print(ctx.command.cog_name)
 
-	return True # / False
+	return True
 
 @bot.event
 async def on_ready() -> None:
