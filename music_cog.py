@@ -50,7 +50,8 @@ class music_Cog(commands.Cog):
 
     @commands.command(name="list")
     async def list_queue(self, ctx: commands.Context) -> None:
-        await ctx.send(print(self.queue))
+        str_list = str(self.queue)
+        await ctx.send(str_list)
         pass
 
     @commands.command()
