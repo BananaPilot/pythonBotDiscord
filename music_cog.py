@@ -1,4 +1,3 @@
-from typing import Any
 from attr import dataclass
 from discord.ext import commands
 from discord import app_commands
@@ -6,6 +5,17 @@ import discord
 from discord_audio_player import DiscordAudioPlayer
 from queue_bot import Queue_bot
 from queue_element import QueueElementType, QueueElement
+from enum import Enum
+
+
+# class JoinState(Enum):
+#     PENDING = 0  # Has never entered
+#     FIRST = 1  # First entrance
+#     SUBSEQUENT = 2 # Second or later entrance
+
+class BotState(Enum):
+    FREE = 0 # Can process commands
+    WORKING = 1 # Elaborating...
 
 
 @dataclass
@@ -15,8 +25,10 @@ class music_Cog(commands.Cog):
     audio_player: DiscordAudioPlayer
     queue: Queue_bot
 
-    isPlaying: bool = False
-    isPaused: bool = False
+    bot_state: BotState = BotState.FREE
+
+    # isPlaying: bool = False
+    # isPaused: bool = False
 
     voice_channel: discord.VoiceChannel = None
 
@@ -25,6 +37,16 @@ class music_Cog(commands.Cog):
     async def play_audio(self, element: QueueElementType) -> None:
         self.audio_player.play(element, self.connected_voice_client)
         pass
+
+    def post_update(self, forced_join: bool = False):
+        if forced_join:
+            forced_join = False
+            self.play_audio(self.queue.first())
+        
+        self.bot_state = BotState.FREE
+
+    # @commands.Cog.listener()
+    # async def on_leave???
 
     @commands.command()
     async def join(self, ctx: commands.Context) -> None:
@@ -92,17 +114,17 @@ class music_Cog(commands.Cog):
     #         await ctx.send(f"Now playing {url}")
 
     @commands.command()
-    async def pause(self, ctx: commands.Context):
+    async def pause(self, ctx: commands.Context) -> None:
         self.connected_voice_client.stop()
         ctx.send("The song has been paused")
 
     @commands.command
-    async def resume(self, ctx: commands.Context):
+    async def resume(self, ctx: commands.Context) -> None:
         self.connected_voice_client.resume()
         ctx.send("The song has resumed")
 
     @commands.command
-    async def skip(self, ctx: commands.Context):
+    async def skip(self, ctx: commands.Context) -> None:
         pass
 
     pass

@@ -22,6 +22,12 @@ class Queue_bot:
     def length(self):
         return len(self.the_queue)
 
+    def first(self):
+        if len(self.the_queue) == 0:
+            return None
+        
+        return self.the_queue[0]
+
     def __str__(self):
         return "\n".join(elem["fulltitle"] for elem in self.the_queue)
 
