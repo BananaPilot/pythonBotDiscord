@@ -1,22 +1,19 @@
-import asyncio
 from typing import Any
 from attr import dataclass
 from discord.ext import commands
 from discord import app_commands
 import discord
-from yt_dlp import YoutubeDL
+from discord_audio_player import DiscordAudioPlayer
 
 
 @dataclass
 @app_commands.guild_only()
 class music_Cog(commands.Cog):
     bot: commands.Bot
-    ffmpeg_path: str
+    audio_player: DiscordAudioPlayer
 
     isPlaying: bool = False
     isPaused: bool = False
-
-    queue: list[str] = []
 
     YDL_OPTIONS: dict[str, Any] = {
         "format": "bestaudio/best",
@@ -35,6 +32,10 @@ class music_Cog(commands.Cog):
     voice_channel: discord.VoiceChannel = None
 
     connected_voice_client: discord.VoiceClient = None
+
+    def addToQueue(self, element: str):
+        queue = self.queue
+        queue.append()
 
     @commands.command()
     async def join(self, ctx: commands.Context) -> None:
@@ -62,23 +63,36 @@ class music_Cog(commands.Cog):
             or ctx.voice_client is None
             or not ctx.voice_client.is_connected()
         ):
-            print_task = asyncio.create_task(
-                ctx.send("I am not connected to a voice channel. Joining...")
-            )
+            await ctx.send("I am not connected to a voice channel. Joining...")
             await self.join()
-            await print_task
 
         if not ctx.author.voice.channel == ctx.voice_client.channel:
             await ctx.send("You are not in my voice channel!")
             return
         if not ctx.voice_client.is_playing():
-            with YoutubeDL(self.YDL_OPTIONS) as ydl:
-                info = ydl.extract_info(url=url, download=False)
+            info = self.audio_player.get_info(url)
 
-            URL = info["url"]
-            voice.play(
-                discord.FFmpegPCMAudio(
-                    URL, executable=self.ffmpeg_path, **self.FFMPEG_OPTIONS
-                )
-            )
-            await ctx.send(f"Now playing {url}")
+            self.audio_player.play(info, voice)
+
+            import json
+
+            with open("info.json", "w") as f:
+                json.dump(info, f)
+
+            await ctx.send(f"Now playing {info['url']}")
+
+    @commands.command()
+    async def pause(self, ctx: commands.Context):
+        self.connected_voice_client.stop()
+        ctx.send("The song has been paused")
+
+    @commands.command
+    async def resume(self, ctx: commands.Context):
+        self.connected_voice_client.resume()
+        ctx.send("The song has resumed")
+
+    @commands.command
+    async def skip(self, ctx: commands.Context):
+        pass
+
+    pass
