@@ -42,9 +42,6 @@ class music_Cog(commands.Cog):
         async def callback(e: Exception = None):
             if e is not None:
                 print(e)
-            if len(self.queue.the_queue) == 0:
-                self.leave(ctx)
-                return
             await self.skip(ctx)
 
         self.audio_player.play(
@@ -175,6 +172,9 @@ class music_Cog(commands.Cog):
     @commands.command(name="skip")
     async def skip(self, ctx: commands.Context) -> None:
         await ctx.send("Skipping...")
+
+        if len(self.queue.the_queue) == 0:
+            self.leave(ctx)
 
         if self.connected_voice_client.is_playing():
             self.connected_voice_client.stop()
