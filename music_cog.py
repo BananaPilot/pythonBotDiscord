@@ -42,14 +42,19 @@ class music_Cog(commands.Cog):
         async def callback(e: Exception = None):
             if e is not None:
                 print(e)
-
+            if len(self.queue.the_queue) == 0:
+                self.leave(ctx)
+                return
             await self.skip(ctx)
 
-        # Don't ask about this one, for the love of god
-        def non_async_callback(e: Exception = None):
-            asyncio.run_coroutine_threadsafe(callback(e), self.discord_bot.loop)
-
-        self.audio_player.play(element, self.connected_voice_client, non_async_callback)
+        self.audio_player.play(
+            element,
+            self.connected_voice_client,
+            # Don't ask about this one, for the love of god
+            lambda e: asyncio.run_coroutine_threadsafe(
+                callback(e), self.discord_bot.loop
+            ),
+        )
 
     async def post_update(
         self, ctx: commands.Context, forced_join: bool = False, show_queue: bool = False
