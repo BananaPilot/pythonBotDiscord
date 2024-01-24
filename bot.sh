@@ -1,6 +1,6 @@
 #!/bin/sh
 
-check_if_installed() {
+check_apt_package() {
   if ! dpkg -s $1 >/dev/null 2>&1; then
     echo $1 not found, installing...
     sudo apt install $1
@@ -19,26 +19,38 @@ check_python_package() {
 #   fi
 }
 
-echo creating a venv for python
+echo checking dependencies...
+
+while read package; do
+  check_apt_package $package
+done < dependencies.txt
+
+echo creating .venv for python...
 
 python -m venv .venv
 
 . .venv/bin/activate
 
-echo virtual environment created
+echo virtual environment created.
 
-echo installing dependencies
-
-while read package; do
-  check_if_installed $package
-done < dependencies.txt
+echo checking python requirements...
 
 while read package; do
   check_python_package $package
 done < requirements.txt
 
-echo dependencies installed
+echo dependencies installed.
 
-echo running the script...
+echo checking for screen...
 
-python main.py
+if [ "$TERM" = "screen" ]; then
+  echo running the script...
+  python main.py
+else
+  session_number=1
+  while screen -list | grep -q "discord_bot_$session_number"; do
+    session_number=$((session_number+1))
+  done
+  echo running the script...
+  screen -dmS discord_bot_$session_number python main.py
+fi
