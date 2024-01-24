@@ -15,7 +15,7 @@ if not has_variables:
     exit(-1)
 
 intents: Intents = Intents.all()
-discord_bot = commands.Bot(command_prefix="!", intents=intents)
+discord_bot = commands.Bot(command_prefix="-", intents=intents)
 
 
 @discord_bot.check

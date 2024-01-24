@@ -17,6 +17,8 @@ class DiscordAudioPlayer:
         "ignoreerrors": "only_download",
         "youtube_include_dash_manifest": False,
         "noplaylist": True,
+        "hls_use_mpegts": True,
+        "live_from_start": False
     }
 
     FFMPEG_OPTIONS: dict[str, Any] = {
