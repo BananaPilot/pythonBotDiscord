@@ -6,6 +6,8 @@ from music_cog import music_Cog
 from discord_audio_player import DiscordAudioPlayer
 from queue_bot import Queue_bot
 
+os.environ["PYTHONASYNCIODEBUG"] = "0"
+
 has_variables = load_dotenv()
 
 if not has_variables:

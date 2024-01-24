@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Callable
 from attr import dataclass
 from yt_dlp import YoutubeDL
 import discord
@@ -30,13 +30,17 @@ class DiscordAudioPlayer:
 
         return info
 
-    def play(self, element: QueueElementType, voice_client: discord.VoiceClient):
+    def play(
+        self,
+        element: QueueElementType,
+        voice_client: discord.VoiceClient,
+        after: Callable[[], None],
+    ):
         url = element["url"]
 
         voice_client.play(
             discord.FFmpegPCMAudio(
                 source=url, executable=self.FFMPEG_PATH, **self.FFMPEG_OPTIONS
-            )
+            ),
+            after=after,
         )
-
-    pass
