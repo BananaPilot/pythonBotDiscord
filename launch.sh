@@ -42,8 +42,6 @@ pip install -r requirements.txt
 
 echo dependencies installed.
 
-deactivate # exit virtual environment
-
 echo checking for screen...
 
 process_name="discord_bot"
